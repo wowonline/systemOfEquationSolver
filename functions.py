@@ -1,12 +1,51 @@
 import numpy as np
 
 
-def reduction_UT(matrix_A, matrix_B, n):
+def determinant(matrix, n):
+    matrix = np.array(matrix, dtype=np.float64)
+    if n == 1:
+        return matrix[0]
+
+    EPS = 0.000000001
+    det = 1.0
+
+    for i in range(n):
+        k = i
+        
+        for j in range(i+1, n):
+            if abs(matrix[j][i]) > abs(matrix[k][i]):
+                k = j
+        
+        if abs(matrix[k][i]) < EPS:
+            det = 0
+            break
+
+        tmp = np.array(matrix[i, :], dtype=np.float64)
+        matrix[i, :] = matrix[k, :]
+        matrix[k, :] = tmp
+
+        if i != k:
+            det = -det
+
+        det *= matrix[i][i]
+        try:
+            matrix[i, :] /= matrix[i][i]
+        except ZeroDivisionError:
+            print("Divided by zero\n")
+
+        for j in range(n):
+            if j != i and abs(matrix[j][i]) > EPS:
+                for k in range(i+1, n):
+                    matrix[j][k] -= matrix[i][k] * matrix[j][i]
+
+    return det
+
+def pivoting_reduction_UT(matrix_A, matrix_B, n):
     """
     Приведение матрицы к верхне-треугольному виду
     и применение тех же преобразований к вектору-
     столбцу. Требования на матрицу A такие же, как 
-    требуется в функции gauss_simple.
+    требуется в функции pivoting_gaussian_elimination.
     """
 
     matrix_A = np.array(matrix_A, dtype=np.float64)
@@ -26,9 +65,7 @@ def reduction_UT(matrix_A, matrix_B, n):
             matrix_A[n-1, n-1] = 1
             break
 
-        for i in range(j, n):
-            if matrix_A[j, i] != 0:
-                break
+        i = np.argmax(matrix_A[j, j:])
         
         tmp = np.array(matrix_A[:, j], dtype=np.float64)
         matrix_A[:, j] = matrix_A[:, i]
@@ -54,7 +91,7 @@ def reduction_UT(matrix_A, matrix_B, n):
     return (matrix_A, matrix_B)        
 
 
-def gauss_simple(matrix_A, matrix_B, n):
+def pivoting_gaussian_elimination(matrix_A, matrix_B, n):
     """
     Матрицы n x n, невырожденные.
     Матрица A выглядит таким образом:
@@ -70,17 +107,17 @@ def gauss_simple(matrix_A, matrix_B, n):
     matrix_A = np.array(matrix_A, dtype=np.float64)
     matrix_B = np.array(matrix_B, dtype=np.float64)
 
-    matrix_A, matrix_B = reduction_UT(matrix_A, matrix_B, n)
+    matrix_A, matrix_B = pivoting_reduction_UT(matrix_A, matrix_B, n)
 
     for j in range(n-1, -1, -1):
         if j == n-1:
-            decision_system = np.array([matrix_B[n-1]])
+            solution_system = np.array([matrix_B[n-1]])
             continue
 
-        tmp = matrix_B[j] - np.sum(matrix_A[j+1:, j] * decision_system)
-        decision_system = np.concatenate((decision_system, [tmp]))
+        tmp = matrix_B[j] - np.sum(matrix_A[j+1:, j] * solution_system)
+        solution_system = np.concatenate((solution_system, [tmp]))
 
-    return decision_system[::-1]
+    return solution_system[::-1]
 
 
 
