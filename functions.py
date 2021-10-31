@@ -1,5 +1,4 @@
 import numpy as np
-from numpy.matrixlib import matrix
 
 
 def determinant(matrix, n, EPS=0.000000001):
@@ -149,26 +148,20 @@ def inverse_matrix(matrix_A, n):
     for j in range(n):
         if j == n-1:
             try:
-                # matrix_B[n-1] /= matrix_A[n-1, n-1]
                 matrix_B[:, n-1] /= matrix_A[n-1, n-1]
             except ZeroDivisionError:
                 print("Divided by zero\n")
             matrix_A[n-1, n-1] = 1
             break
 
-        # i = np.argmax(matrix_A[j, j:])
         for i in range(j, n):
              if matrix_A[j, i] != 0:
                  break
-
         
         tmp = np.array(matrix_A[:, j], dtype=np.float64)
         matrix_A[:, j] = matrix_A[:, i]
         matrix_A[:, i] = tmp
 
-        # tmp = np.array(matrix_B[j], dtype=np.float64)
-        # matrix_B[j] = matrix_B[i]
-        # matrix_B[i] = tmp
         tmp = np.array(matrix_B[:, j], dtype=np.float64)
         matrix_B[:, j] = matrix_B[:, i]
         matrix_B[:, i] = tmp
@@ -176,7 +169,6 @@ def inverse_matrix(matrix_A, n):
         pivot = matrix_A[j, i]
         try:
             matrix_A[:, i] /= pivot
-            # matrix_B[i] /= pivot
             matrix_B[:, i] /= pivot
         except ZeroDivisionError:
             print("Divided by zero\n")
@@ -185,7 +177,6 @@ def inverse_matrix(matrix_A, n):
             if matrix_A[j, i] != 0:
                 factor = matrix_A[j, i]
                 matrix_A[:, i] -= factor * matrix_A[:, j]
-                # matrix_B[i] -= factor * matrix_B[j]
                 matrix_B[:, i] -= factor * matrix_B[:, j]
 
     for i in range(n-1, 0, -1):
@@ -195,8 +186,8 @@ def inverse_matrix(matrix_A, n):
             matrix_B[:, j] -= matrix_B[:, i] * scalar
 
     matrix_A[matrix_A == -0] = 0
-    matrix_B[matrix_B == -0] = 0
-    return (matrix_A, matrix_B)        
+    matrix_B[matrix_B == -0] = 0    
+    return matrix_B   
 
 
 def matrix_multiplication(matrix_A, matrix_B, n, eps=0.0001):
@@ -207,5 +198,11 @@ def matrix_multiplication(matrix_A, matrix_B, n, eps=0.0001):
             tmp = np.sum(matrix_A[:, i] * matrix_B[j, :])
             result[i, j] = tmp if tmp > eps else 0
 
-
     return result
+
+def matrix_norm(matrix, n):
+    matrix = np.abs(matrix)
+    return np.array([np.sum(matrix[j, :]) for j in range(n)]).max()
+
+def matrix_condition_number(matrix, n):
+    return matrix_norm(matrix, n) * matrix_norm(inverse_matrix(matrix, n), n)
