@@ -91,6 +91,8 @@ def pivoting_reduction_UT(matrix_A, matrix_B, n):
                 matrix_A[:, i] -= factor * matrix_A[:, j]
                 matrix_B[i] -= factor * matrix_B[j]
 
+    matrix_A[matrix_A == -0] = 0
+    matrix_B[matrix_B == -0] = 0
     return (matrix_A, matrix_B)        
 
 
@@ -126,8 +128,84 @@ def pivoting_gaussian_elimination(matrix_A, matrix_B, n):
     return solution_system[::-1]
 
 
+def inverse_matrix(matrix_A, n):
+    if determinant(matrix_A, n) == 0:
+        print("Enter matrix with non-zero determinant")
+        return -1
+
+    matrix_B = np.diag([1] * n)
+
+    matrix_A = np.array(matrix_A, dtype=np.float64)
+    matrix_B = np.array(matrix_B, dtype=np.float64)
+
+    if n == 1:
+        try:
+            matrix_B /= matrix_A
+        except ZeroDivisionError:
+            print("Divided by zero\n")
+        matrix_A[0] = 1
+        return (matrix_A, matrix_B)
+
+    for j in range(n):
+        if j == n-1:
+            try:
+                # matrix_B[n-1] /= matrix_A[n-1, n-1]
+                matrix_B[:, n-1] /= matrix_A[n-1, n-1]
+            except ZeroDivisionError:
+                print("Divided by zero\n")
+            matrix_A[n-1, n-1] = 1
+            break
+
+        # i = np.argmax(matrix_A[j, j:])
+        for i in range(j, n):
+             if matrix_A[j, i] != 0:
+                 break
+
+        
+        tmp = np.array(matrix_A[:, j], dtype=np.float64)
+        matrix_A[:, j] = matrix_A[:, i]
+        matrix_A[:, i] = tmp
+
+        # tmp = np.array(matrix_B[j], dtype=np.float64)
+        # matrix_B[j] = matrix_B[i]
+        # matrix_B[i] = tmp
+        tmp = np.array(matrix_B[:, j], dtype=np.float64)
+        matrix_B[:, j] = matrix_B[:, i]
+        matrix_B[:, i] = tmp
+
+        pivot = matrix_A[j, i]
+        try:
+            matrix_A[:, i] /= pivot
+            # matrix_B[i] /= pivot
+            matrix_B[:, i] /= pivot
+        except ZeroDivisionError:
+            print("Divided by zero\n")
+
+        for i in range(j+1, n):
+            if matrix_A[j, i] != 0:
+                factor = matrix_A[j, i]
+                matrix_A[:, i] -= factor * matrix_A[:, j]
+                # matrix_B[i] -= factor * matrix_B[j]
+                matrix_B[:, i] -= factor * matrix_B[:, j]
+
+    for i in range(n-1, 0, -1):
+        for j in range(i-1, -1, -1):
+            scalar = matrix_A[i, j]
+            matrix_A[:, j] -= matrix_A[:, i] * scalar
+            matrix_B[:, j] -= matrix_B[:, i] * scalar
+
+    matrix_A[matrix_A == -0] = 0
+    matrix_B[matrix_B == -0] = 0
+    return (matrix_A, matrix_B)        
 
 
+def matrix_multiplication(matrix_A, matrix_B, n, eps=0.0001):
+    result = np.zeros((n, n))
+
+    for i in range(n):
+        for j in range(n):
+            tmp = np.sum(matrix_A[:, i] * matrix_B[j, :])
+            result[i, j] = tmp if tmp > eps else 0
 
 
-
+    return result
