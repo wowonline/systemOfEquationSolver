@@ -55,16 +55,25 @@ if __name__ == "__main__":
     except ValueError:
         exit()
     
+    optiondict = {
+        0 : func.pivoting_gaussian_elimination,
+        1 : func.determinant,
+        2 : func.inverse_matrix,
+        3 : func.matrix_norm,
+        4 : func.matrix_condition_number
+    }
     if opt == 0:
-        print(func.pivoting_gaussian_elimination(a, b, size))
-    elif opt == 1:
-        print(func.determinant(a, size))
-    elif opt == 2:
-        print(func.inverse_matrix(a, size))
-    elif opt == 3:
-        print(func.matrix_norm(a, size))
-    elif opt == 4:
-        print(func.matrix_condition_number(a, size))
+        print(optiondict[opt](a, b, size))
     else:
-        print("Enter another number!")
-        exit()
+        print(optiondict[opt](a, size))
+    # elif opt == 1:
+    #     print(func.determinant(a, size))
+    # elif opt == 2:
+    #     print(func.inverse_matrix(a, size))
+    # elif opt == 3:
+    #     print(func.matrix_norm(a, size))
+    # elif opt == 4:
+    #     print(func.matrix_condition_number(a, size))
+    # else:
+    #     print("Enter another number!")
+    #     exit()
