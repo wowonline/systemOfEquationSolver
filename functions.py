@@ -200,9 +200,11 @@ def matrix_multiplication(matrix_A, matrix_B, n, eps=0.0001):
 
     return result
 
+
 def matrix_norm(matrix, n):
     matrix = np.abs(matrix)
     return np.array([np.sum(matrix[j, :]) for j in range(n)]).max()
+
 
 def matrix_condition_number(matrix, n):
     return matrix_norm(matrix, n) * matrix_norm(inverse_matrix(matrix, n), n)
