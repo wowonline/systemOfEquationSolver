@@ -66,14 +66,3 @@ if __name__ == "__main__":
         print(optiondict[opt](a, b, size))
     else:
         print(optiondict[opt](a, size))
-    # elif opt == 1:
-    #     print(func.determinant(a, size))
-    # elif opt == 2:
-    #     print(func.inverse_matrix(a, size))
-    # elif opt == 3:
-    #     print(func.matrix_norm(a, size))
-    # elif opt == 4:
-    #     print(func.matrix_condition_number(a, size))
-    # else:
-    #     print("Enter another number!")
-    #     exit()
